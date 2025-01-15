@@ -1,0 +1,41 @@
+name: Deploy Flask App
+
+on:
+  push:
+    branches:
+      - main  # Se ejecutará cuando haya un push a la rama main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout del código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Configurar Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Configurar variables de entorno con Secrets
+      - name: Set environment variables
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_UPDATE_DATABASE }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: echo "Environment variables configured."
+
+      # 5. Desplegar la aplicación
+      - name: Deploy Flask App
+        run: |
+          python app.py
